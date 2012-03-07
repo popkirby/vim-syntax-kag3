@@ -53,12 +53,14 @@ syntax match kag3AttrValue          /=[^'" \t][^ \t\]]*/hs=s+1 contained
 syntax keyword kag3Boolean true false contained
 
 " Include TJS2 syntax.
-syntax include @kag3Tjs2Top syntax/tjs2.vim
-syntax region kag3Tjs2Script         start="\[iscript\]"ms=s+9  end="\[endscript\]"me=s-1 keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
-syntax region kag3Tjs2Script         start="^@iscript"rs=s+8    end="^@endscript"me=s-1   keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
-syntax region kag3Tjs2ScriptTag      start="\[\(iscript\]\)\@=" end="\]" oneline contained        contains=kag3Tjs2ScriptTagName
-syntax region kag3Tjs2ScriptTag      start="@\(iscript\)\@="    end="$"  contained                contains=kag3Tjs2ScriptTagName
-syntax match  kag3Tjs2ScriptTagName  "iscript" contained
+if globpath(&rtp, 'syntax/tjs2.vim') != ''
+  syntax include @kag3Tjs2Top syntax/tjs2.vim
+  syntax region kag3Tjs2Script         start="\[iscript\]"ms=s+9  end="\[endscript\]"me=s-1 keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
+  syntax region kag3Tjs2Script         start="^@iscript"rs=s+8    end="^@endscript"me=s-1   keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
+  syntax region kag3Tjs2ScriptTag      start="\[\(iscript\]\)\@=" end="\]" oneline contained        contains=kag3Tjs2ScriptTagName
+  syntax region kag3Tjs2ScriptTag      start="@\(iscript\)\@="    end="$"  contained                contains=kag3Tjs2ScriptTagName
+  syntax match  kag3Tjs2ScriptTagName  "iscript" contained
+endif
 
 " Define highlighting
 if version >= 508 || !exists("did_kag3_syn_inits")
