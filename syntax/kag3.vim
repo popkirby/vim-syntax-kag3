@@ -21,6 +21,8 @@ endif
 syntax sync fromstart
 syntax case match
 
+
+
 " KAG3 comments
 " starts when ';' appeared
 syntax region kag3Comment           start=/^;/ end=/$/
@@ -39,7 +41,7 @@ syntax region kag3TagOneLine        start=/@/  end=/$/  keepend contains=kag3Tag
 
 " Tag name
 syntax match kag3TagName            "\[[^ \t\]]\+"hs=s+1 contained
-syntax match kag3TagName            "@\S\+"hs=s+1  contained
+syntax match kag3TagName            "^@\S\+"hs=s+1  contained
 
 " Tag Attribute
 syntax match kag3Attribute          "\s+\S+"hs=s+1 contained
@@ -50,6 +52,14 @@ syntax match kag3AttrValue          /=[^'" \t][^ \t\]]*/hs=s+1 contained
 " Boolean
 syntax keyword kag3Boolean true false contained
 
+" Include TJS2 syntax.
+syntax include @kag3Tjs2Top syntax/tjs2.vim
+syntax region kag3Tjs2Script         start="\[iscript\]"ms=s+9  end="\[endscript\]"me=s-1 keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
+syntax region kag3Tjs2Script         start="^@iscript"rs=s+8    end="^@endscript"me=s-1   keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
+syntax region kag3Tjs2ScriptTag      start="\[\(iscript\]\)\@=" end="\]" oneline contained        contains=kag3Tjs2ScriptTagName
+syntax region kag3Tjs2ScriptTag      start="@\(iscript\)\@="    end="$"  contained                contains=kag3Tjs2ScriptTagName
+syntax match  kag3Tjs2ScriptTagName  "iscript" contained
+
 " Define highlighting
 if version >= 508 || !exists("did_kag3_syn_inits")
   if version < 508
@@ -59,13 +69,14 @@ if version >= 508 || !exists("did_kag3_syn_inits")
     command -nargs=+ HiLink hi def link <args>
   endif
 
-  " Use HTML highlighting definition.
   HiLink kag3Comment Comment
   HiLink kag3String String
   HiLink kag3LabelName Label
   HiLink kag3LabelDescription Special
+  HiLink kag3Tjs2ScriptTag kag3Tag
   HiLink kag3Tag Function
   HiLink kag3TagOneLine Identifier
+  HiLink kag3Tjs2ScriptTagName Identifier
   HiLink kag3TagName Statement
   HiLink kag3Attribute Type
   HiLink kag3AttrValue String
@@ -78,6 +89,3 @@ let b:current_syntax = "kag3"
 if main_syntax == 'kag3'
   unlet main_syntax
 endif
-
-
-

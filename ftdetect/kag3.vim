@@ -1,1 +1,1 @@
-autocmd! filetypedetect BufNewFile,BufRead *.ks set filetype=kag3
+autocmd! filetypedetect BufNewFile,BufRead *.ks setfiletype kag3
