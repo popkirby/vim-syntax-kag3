@@ -1,12 +1,11 @@
 " Vim syntax file
 " Language:     KAG3
 " Maintainer:   popkirby <popkirby@gmail.com>
-" Last Change:  2012 Mar 3
+" Last Change:  2012 Mar 12
 " Remark:       Include TJS syntax.
-" Changes:      First submission.
+" Changes:      Added folding at [iscript], [macro].
 "
 " TODO:
-"  - Add TJS syntax at [iscript] ~ [endscript].
 
 if !exists("main_syntax")
   if version < 600
@@ -16,6 +15,7 @@ if !exists("main_syntax")
   endif
   let main_syntax = 'kag3'
 endif
+
 
 
 syntax sync fromstart
@@ -55,12 +55,23 @@ syntax keyword kag3Boolean true false contained
 " Include TJS2 syntax.
 if globpath(&rtp, 'syntax/tjs2.vim') != ''
   syntax include @kag3Tjs2Top syntax/tjs2.vim
-  syntax region kag3Tjs2Script         start="\[iscript\]"ms=s+9  end="\[endscript\]"me=s-1 keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
+  syntax region kag3Tjs2Script         start="\[iscript\]"rs=s+9  end="\[endscript\]"me=s-1 keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
   syntax region kag3Tjs2Script         start="^@iscript"rs=s+8    end="^@endscript"me=s-1   keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
   syntax region kag3Tjs2ScriptTag      start="\[\(iscript\]\)\@=" end="\]" oneline contained        contains=kag3Tjs2ScriptTagName
   syntax region kag3Tjs2ScriptTag      start="@\(iscript\)\@="    end="$"  contained                contains=kag3Tjs2ScriptTagName
   syntax match  kag3Tjs2ScriptTagName  "iscript" contained
 endif
+
+" Folding
+let g:use_kag3_syntax_folding = get(g:, 'use_kag3_syntax_folding', 1)
+if g:use_kag3_syntax_folding == 1
+  syntax region kag3Tjs2ScriptFold1      start="\[iscript\]" end="\[endscript\]" transparent fold keepend
+  syntax region kag3Tjs2ScriptFold2      start="^@iscript"   end="^@endscript"   transparent fold keepend
+  syntax region kag3MacroFold1           start="\[macro"     end="\[endmacro\]"  transparent fold keepend
+  syntax region kag3MacroFold2           start="^@macro"     end="^@endmacro"    transparent fold keepend
+  set foldmethod=syntax
+endif
+
 
 " Define highlighting
 if version >= 508 || !exists("did_kag3_syn_inits")
