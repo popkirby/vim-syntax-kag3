@@ -27,39 +27,40 @@ syntax case match
 " starts when ';' appeared
 syntax region kag3Comment           start=/^;/ end=/$/
 
-" Strings
-syntax region kag3String            start=/"/ skip=/\\"/ end=/"/ contained
-syntax region kag3String            start=/'/ skip=/\\'/ end=/'/ contained
-
-" Labels
-syntax region kag3LabelName         start=/^\*/ end=/$/ keepend contains=kag3LabelDescription
-syntax region kag3LabelDescription  start=/|/ end=/$/ contained
-
 " Tags
-syntax region kag3Tag               start=/\[/ end=/\]/ oneline contains=kag3TagName,kag3Attribute,kag3Boolean,kag3AttrValue,kag3String
-syntax region kag3TagOneLine        start=/@/  end=/$/  keepend contains=kag3TagName,kag3Attribute,kag3Boolean,kag3AttrValue,kag3String
+syntax region kag3Tag               start=/\[/ end=/\]/ contains=kag3TagName,kag3Attribute
+syntax region kag3Tag               start=/@/  end=/$/  contains=kag3TagName,kag3Attribute
+
+" Attribute
+syntax match  kag3Attribute         +\<[^ \t="'\]]\++ contained nextgroup=kag3AttrEqual,kag3Attribute skipwhite
+syntax match  kag3AttrEqual         "="               contained nextgroup=@kag3AttrValue
 
 " Tag name
-syntax match kag3TagName            "\[[^ \t\]]\+"hs=s+1 contained
-syntax match kag3TagName            "^@\S\+"hs=s+1  contained
+syntax match  kag3TagName           +\(\[\|@\)\@1<=[^ \t="'\]]\++ contained
 
-" Tag Attribute
-syntax match kag3Attribute          "\s+\S+"hs=s+1 contained
+" Attribute Value
+syntax region  kag3AttrString        start=/"/ skip=/\\"/ end=/"/ contained
+syntax region  kag3AttrString        start=/'/ skip=/\\'/ end=/'/ contained
+syntax match   kag3AttrNumber        "\d\+" contained
+syntax keyword kag3AttrBoolean       true false contained
 
-" Tag Value
-syntax match kag3AttrValue          /=[^'" \t][^ \t\]]*/hs=s+1 contained
+syntax cluster kag3AttrValue         contains=kag3AttrString,kag3AttrNumber,kag3AttrBoolean
 
-" Boolean
-syntax keyword kag3Boolean true false contained
+" Labels
+syntax region kag3Label             matchgroup=kag3LabelDescBar start=/^\*/ end=/$/ keepend contains=kag3LabelDescBar
+syntax match  kag3LabelDescBar      "|"   contained
+
+" Comment
+syntax match  kag3Comment           ";.*"
 
 " Include TJS2 syntax.
 if globpath(&rtp, 'syntax/tjs2.vim') != ''
-  syntax include @kag3Tjs2Top syntax/tjs2.vim
-  syntax region kag3Tjs2Script         start="\[iscript\]"rs=s+9  end="\[endscript\]"me=s-1 keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
-  syntax region kag3Tjs2Script         start="^@iscript"rs=s+8    end="^@endscript"me=s-1   keepend contains=@kag3Tjs2Top,kag3Tjs2ScriptTag
-  syntax region kag3Tjs2ScriptTag      start="\[\(iscript\]\)\@=" end="\]" oneline contained        contains=kag3Tjs2ScriptTagName
-  syntax region kag3Tjs2ScriptTag      start="@\(iscript\)\@="    end="$"  contained                contains=kag3Tjs2ScriptTagName
-  syntax match  kag3Tjs2ScriptTagName  "iscript" contained
+  syntax include @kag3TJS2Top syntax/tjs2.vim
+  syntax region  kag3TJS2Script            start="^\[iscript\]"      end="^\[endscript\]" transparent keepend      contains=@kag3TJS2Top,kag3TJS2ScriptTag
+  syntax region  kag3TJS2Script            start="^@iscript$"        end="^@endscript$"   transparent keepend      contains=@kag3TJS2Top,kag3TJS2ScriptTag
+  syntax region  kag3TJS2ScriptTag         start="^\[\(iscript\|endscript\)\@=" end="\]"  contained contains=kag3TJS2ScriptTagName
+  syntax region  kag3TJS2ScriptTag         start="^@\(iscript\|endscript\)\@="  end="$"   contained contains=kag3TJS2ScriptTagName
+  syntax keyword kag3TJS2ScriptTagName     iscript endscript contained
 endif
 
 " Folding
@@ -83,17 +84,23 @@ if version >= 508 || !exists("did_kag3_syn_inits")
   endif
 
   HiLink kag3Comment Comment
-  HiLink kag3String String
-  HiLink kag3LabelName Label
-  HiLink kag3LabelDescription Special
-  HiLink kag3Tjs2ScriptTag kag3Tag
-  HiLink kag3Tag Function
-  HiLink kag3TagOneLine Identifier
-  HiLink kag3Tjs2ScriptTagName Identifier
-  HiLink kag3TagName Statement
+
+  HiLink kag3Tag Special
+  
   HiLink kag3Attribute Type
-  HiLink kag3AttrValue String
-  HiLink kag3Boolean Boolean
+  HiLink kag3AttrEqual Statement
+
+  HiLink kag3TagName Statement
+
+  HiLink kag3AttrString String
+  HiLink kag3AttrBoolean Boolean
+  HiLink kag3AttrNumber Number
+  
+  HiLink kag3Label Label
+  HiLink kag3LabelDescBar Special
+
+  HiLink kag3TJS2ScriptTag kag3Tag
+  HiLink kag3TJS2ScriptTagName kag3TagName
 
   delcommand HiLink
 endif
@@ -102,3 +109,4 @@ let b:current_syntax = "kag3"
 if main_syntax == 'kag3'
   unlet main_syntax
 endif
+
