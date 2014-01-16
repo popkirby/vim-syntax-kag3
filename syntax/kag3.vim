@@ -16,16 +16,8 @@ if !exists("main_syntax")
   let main_syntax = 'kag3'
 endif
 
-
-
 syntax sync fromstart
 syntax case match
-
-
-
-" KAG3 comments
-" starts when ';' appeared
-syntax region kag3Comment           start=/^;/ end=/$/
 
 " Tags
 syntax region kag3Tag               start=/\[/ end=/\]/ contains=kag3TagName,kag3Attribute
